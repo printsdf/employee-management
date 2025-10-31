@@ -8,10 +8,11 @@
         return;
     }
 
-    // 获取 employeeId 参数
+    // 获取 employeeId 和 salaryMonth 参数
     String employeeId = request.getParameter("employeeId");
-    if (employeeId == null || employeeId.trim().isEmpty()) {
-        out.println("<p>无效的工号！</p>");
+    String salaryMonth = request.getParameter("salaryMonth");
+    if (employeeId == null || employeeId.trim().isEmpty() || salaryMonth == null || salaryMonth.trim().isEmpty()) {
+        out.println("<p>无效的参数！</p>");
         return;
     }
 
@@ -32,9 +33,10 @@
         conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/employeemanagement", "root", "123456");
 
         // 查询工资信息
-        String query = "SELECT month, base_salary, attendance_bonus, total_salary, deductions FROM salary WHERE employee_id = ?";
+        String query = "SELECT month, base_salary, attendance_bonus, total_salary, deductions FROM salary WHERE employee_id = ? AND month = ?";
         stmt = conn.prepareStatement(query);
         stmt.setString(1, employeeId);
+        stmt.setString(2, salaryMonth);
         rs = stmt.executeQuery();
 
         if (rs.next()) {
