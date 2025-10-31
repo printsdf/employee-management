@@ -2,6 +2,7 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.DriverManager" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="java.util.regex.*" %}
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%
     String username = (String) session.getAttribute("username");
@@ -15,6 +16,14 @@
 
     if (!newPassword.equals(confirmPassword)) {
         request.setAttribute("errorMessage", "两次输入的密码不一致！");
+        request.getRequestDispatcher("editPassword.jsp").forward(request, response);
+        return;
+    }
+    
+    // 验证密码强度
+    int strength = checkPasswordStrength(newPassword);
+    if (strength <= 1) {
+        request.setAttribute("errorMessage", "密码强度太弱，请使用更强的密码！");
         request.getRequestDispatcher("editPassword.jsp").forward(request, response);
         return;
     }
@@ -47,5 +56,42 @@
     } finally {
         if (ps != null) ps.close();
         if (conn != null) conn.close();
+    }
+
+// 密码强度检测函数
+<%!
+    public int checkPasswordStrength(String password) {
+        if (password == null || password.isEmpty()) {
+            return 0;
+        }
+        
+        int strength = 0;
+        
+        // 长度检测
+        if (password.length() >= 8) strength++;
+        if (password.length() >= 12) strength++;
+        
+        // 字符类型检测
+        if (Pattern.compile("[a-z]").matcher(password).find()) strength++;
+        if (Pattern.compile("[A-Z]").matcher(password).find()) strength++;
+        if (Pattern.compile("[0-9]").matcher(password).find()) strength++;
+        if (Pattern.compile("[^a-zA-Z0-9]").matcher(password).find()) strength++;
+        
+        // 复杂度检测
+        if (Pattern.compile("[a-z]").matcher(password).find() && 
+            Pattern.compile("[A-Z]").matcher(password).find()) strength++;
+        if (Pattern.compile("[a-zA-Z]").matcher(password).find() && 
+            Pattern.compile("[0-9]").matcher(password).find()) strength++;
+        if (Pattern.compile("[a-zA-Z0-9]").matcher(password).find() && 
+            Pattern.compile("[^a-zA-Z0-9]").matcher(password).find()) strength++;
+        
+        // 重复字符检测
+        if (!Pattern.compile("(.)\\1{2,}").matcher(password).find()) strength++;
+        
+        // 连续字符检测
+        if (!Pattern.compile("abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz", Pattern.CASE_INSENSITIVE).matcher(password).find()) strength++;
+        if (!Pattern.compile("012|123|234|345|456|567|678|789|987|876|765|654|543|432|321|210").matcher(password).find()) strength++;
+        
+        return strength;
     }
 %>
