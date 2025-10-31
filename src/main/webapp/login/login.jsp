@@ -70,6 +70,12 @@
             margin-top: 0.5rem;
             text-align: center;
         }
+        .success {
+            color: green;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
     </style>
     <script>
         function refreshCaptcha() {
@@ -82,10 +88,13 @@
 <div class="login-container">
     <h1>登录</h1>
 
-    <!-- 错误消息显示 -->
+    <!-- 消息显示 -->
     <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+    <% String successMessage = request.getParameter("message"); %>
     <% if (errorMessage != null) { %>
     <div class="error"><%= errorMessage %></div>
+    <% } else if (successMessage != null) { %>
+    <div class="success"><%= java.net.URLDecoder.decode(successMessage, "UTF-8") %></div>
     <% } %>
 
     <form action="loginHandler.jsp" method="post">
