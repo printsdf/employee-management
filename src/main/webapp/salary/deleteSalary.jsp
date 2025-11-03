@@ -8,11 +8,12 @@
         return;
     }
 
-    // 获取 employeeId 参数
+    // 获取 employeeId 和 salaryMonth 参数
     String employeeId = request.getParameter("employeeId");
+    String salaryMonth = request.getParameter("salaryMonth");
 
-    if (employeeId == null || employeeId.trim().isEmpty()) {
-        out.println("<script>alert('无效的工号！'); window.history.back();</script>");
+    if (employeeId == null || employeeId.trim().isEmpty() || salaryMonth == null || salaryMonth.trim().isEmpty()) {
+        out.println("<script>alert('无效的参数！'); window.history.back();</script>");
         return;
     }
 
@@ -25,9 +26,10 @@
         conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/employeemanagement", "root", "123456");
 
         // 删除工资记录
-        String query = "DELETE FROM salary WHERE employee_id = ?";
+        String query = "DELETE FROM salary WHERE employee_id = ? AND month = ?";
         stmt = conn.prepareStatement(query);
         stmt.setString(1, employeeId);
+        stmt.setString(2, salaryMonth);
 
         int rowsDeleted = stmt.executeUpdate();
         if (rowsDeleted > 0) {
