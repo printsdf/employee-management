@@ -169,24 +169,7 @@
         e.printStackTrace();
     }
 
-    try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/employeemanagement", "root", "123456");
 
-        stmt = conn.prepareStatement(sql.toString());
-
-        int index = 1;
-        if (filterName != null && !filterName.trim().isEmpty()) {
-            stmt.setString(index++, "%" + filterName + "%");
-        }
-        if (filterEmployeeId != null && !filterEmployeeId.trim().isEmpty()) {
-            stmt.setString(index++, "%" + filterEmployeeId + "%");
-        }
-
-        rs = stmt.executeQuery();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
 %>
 
 <!DOCTYPE html>
@@ -472,7 +455,7 @@
         // 导出CSV功能
         function exportCSV(type) {
             var form = document.getElementById('filterForm');
-            var action = form.action;
+            var action = 'exportSalary.jsp';
             
             // 添加导出参数
             var input = document.createElement('input');
@@ -481,7 +464,19 @@
             input.value = type;
             form.appendChild(input);
             
+            // 保存当前表单属性
+            var originalAction = form.action;
+            var originalMethod = form.method;
+            
+            // 修改表单属性并提交
+            form.action = action;
+            form.method = 'GET';
             form.submit();
+            
+            // 恢复表单属性
+            form.action = originalAction;
+            form.method = originalMethod;
+            
             form.removeChild(input);
         }
         
